@@ -53,7 +53,7 @@ class ProductService
 
         $this->activityLog->log('product.updated', $product);
 
-        return $product;
+        return $product->fresh(['merchant', 'market', 'place', 'category', 'images']);
     }
 
     public function delete(Product $product): bool

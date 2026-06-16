@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\API\V1\AuthController;
+use App\Http\Controllers\API\V1\ProductCategoryController;
 use App\Http\Controllers\API\V1\LedDisplayController;
 use App\Http\Controllers\API\V1\MerchantController;
+use App\Http\Controllers\API\V1\MarketBlockController;
 use App\Http\Controllers\API\V1\MarketController;
 use App\Http\Controllers\API\V1\PaymentReceiptController;
 use App\Http\Controllers\API\V1\PlaceController;
@@ -16,6 +18,8 @@ Route::prefix('v1')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
 
     // Public
+    Route::get('product-categories', [ProductCategoryController::class, 'index']);
+
     Route::get('markets', [MarketController::class, 'index']);
     Route::get('markets/popular', [MarketController::class, 'popular']);
     Route::get('markets/{market}', [MarketController::class, 'show']);
@@ -23,6 +27,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('places', [PlaceController::class, 'index']);
     Route::get('places/{place}', [PlaceController::class, 'show']);
+    Route::get('markets/{market}/blocks', [MarketBlockController::class, 'index']);
 
     Route::get('products', [ProductController::class, 'index']);
     Route::get('products/trending', [ProductController::class, 'trending']);
@@ -56,8 +61,13 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::middleware(['permission:manage_places'])->group(function () {
+            Route::post('markets/{market}/blocks', [MarketBlockController::class, 'store']);
+            Route::put('market-blocks/{marketBlock}', [MarketBlockController::class, 'update']);
+            Route::delete('market-blocks/{marketBlock}', [MarketBlockController::class, 'destroy']);
+
             Route::post('places', [PlaceController::class, 'store']);
             Route::put('places/{place}', [PlaceController::class, 'update']);
+            Route::delete('places/{place}', [PlaceController::class, 'destroy']);
             Route::post('places/{place}/assign-chief', [PlaceController::class, 'assignChief']);
 
             Route::get('place-requests', [PlaceRequestController::class, 'index']);

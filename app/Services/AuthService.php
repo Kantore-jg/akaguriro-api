@@ -17,6 +17,7 @@ class AuthService
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'password' => $data['password'],
+            'avatar' => $data['avatar'] ?? null,
         ]);
 
         $user->assignRole(UserRole::User->value);

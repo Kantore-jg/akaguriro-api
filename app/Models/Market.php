@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -15,17 +16,21 @@ class Market extends Model
     protected $fillable = [
         'name', 'slug', 'city', 'location', 'description',
         'image', 'cover_image', 'total_places', 'occupied_places',
-        'latitude', 'longitude', 'category_tags', 'is_active', 'visit_count',
+        'latitude', 'longitude', 'is_active', 'visit_count',
     ];
 
     protected function casts(): array
     {
         return [
-            'category_tags' => 'array',
             'is_active' => 'boolean',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];
+    }
+
+    public function productCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductCategory::class, 'market_product_category');
     }
 
     public function blocks(): HasMany

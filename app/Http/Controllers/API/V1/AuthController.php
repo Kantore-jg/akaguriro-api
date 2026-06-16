@@ -23,7 +23,14 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request): JsonResponse
     {
-        $result = $this->authService->register($request->validated());
+        $data = $request->validated();
+        unset($data['avatar']);
+
+        if ($request->hasFile('avatar')) {
+            $data['avatar'] = $this->fileStorage->store($request->file('avatar'), 'avatars');
+        }
+
+        $result = $this->authService->register($data);
 
         return ApiResponse::success([
             'user' => new UserResource($result['user']),

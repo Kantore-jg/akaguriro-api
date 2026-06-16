@@ -44,7 +44,9 @@ class ProductController extends Controller
         $this->authorize('view', $product);
         $this->productService->recordView($product, $request->user()?->id, $request->ip());
 
-        return ApiResponse::success(new ProductResource($product));
+        return ApiResponse::success(new ProductResource(
+            $product->load(['merchant', 'market', 'place', 'category', 'images'])
+        ));
     }
 
     public function store(StoreProductRequest $request): JsonResponse

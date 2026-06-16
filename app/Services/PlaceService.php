@@ -12,7 +12,10 @@ use Illuminate\Support\Str;
 
 class PlaceService
 {
-    public function __construct(private ActivityLogService $activityLog) {}
+    public function __construct(
+        private ActivityLogService $activityLog,
+        private MarketBlockService $blockService,
+    ) {}
 
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
@@ -41,18 +44,36 @@ class PlaceService
 
         $place = Place::create($data);
         $this->syncMarketCounts($place->market_id);
+        $this->syncBlockCounts($place->market_block_id);
         $this->activityLog->log('place.created', $place);
 
-        return $place->load(['market', 'chief', 'members.user']);
+        return $place->load(['market', 'block', 'chief', 'members.user']);
     }
 
     public function update(Place $place, array $data): Place
     {
+        $previousBlockId = $place->market_block_id;
         $place->update($data);
         $this->syncMarketCounts($place->market_id);
+        $this->syncBlockCounts($place->market_block_id);
+        if ($previousBlockId && $previousBlockId !== $place->market_block_id) {
+            $this->syncBlockCounts($previousBlockId);
+        }
         $this->activityLog->log('place.updated', $place);
 
-        return $place->fresh(['market', 'chief', 'members.user']);
+        return $place->fresh(['market', 'block', 'chief', 'members.user']);
+    }
+
+    public function delete(Place $place): void
+    {
+        $marketId = $place->market_id;
+        $blockId = $place->market_block_id;
+
+        $this->activityLog->log('place.deleted', $place);
+        $place->delete();
+
+        $this->syncMarketCounts($marketId);
+        $this->syncBlockCounts($blockId);
     }
 
     public function assignChief(Place $place, User $user): Place
@@ -75,7 +96,7 @@ class PlaceService
         $this->syncMarketCounts($place->market_id);
         $this->activityLog->log('place.chief_assigned', $place, ['user_id' => $user->id]);
 
-        return $place->fresh(['market', 'chief', 'members.user']);
+        return $place->fresh(['market', 'block', 'chief', 'members.user']);
     }
 
     public function addMember(Place $place, User $user): PlaceMember
@@ -101,5 +122,17 @@ class PlaceService
             'total_places' => $total,
             'occupied_places' => $occupied,
         ]);
+    }
+
+    private function syncBlockCounts(?int $blockId): void
+    {
+        if (! $blockId) {
+            return;
+        }
+
+        $block = \App\Models\MarketBlock::find($blockId);
+        if ($block) {
+            $this->blockService->syncPlacesCount($block);
+        }
     }
 }

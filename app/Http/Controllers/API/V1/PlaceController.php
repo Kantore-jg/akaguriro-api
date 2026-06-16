@@ -29,7 +29,9 @@ class PlaceController extends Controller
     {
         $this->authorize('view', $place);
 
-        return ApiResponse::success(new PlaceResource($place->load(['market', 'chief', 'members.user'])));
+        return ApiResponse::success(new PlaceResource(
+            $place->load(['market', 'block', 'chief', 'members.user'])
+        ));
     }
 
     public function store(StorePlaceRequest $request): JsonResponse
@@ -64,5 +66,13 @@ class PlaceController extends Controller
         $place = $this->placeService->assignChief($place, $user);
 
         return ApiResponse::success(new PlaceResource($place), 'Chef de place assigné');
+    }
+
+    public function destroy(Place $place): JsonResponse
+    {
+        $this->authorize('delete', $place);
+        $this->placeService->delete($place);
+
+        return ApiResponse::success(null, 'Emplacement supprimé');
     }
 }

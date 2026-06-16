@@ -36,7 +36,7 @@ class DemoDataSeeder extends Seeder
                 'description' => 'Le plus grand centre commercial populaire de Bujumbura.',
                 'total_places' => 120,
                 'occupied_places' => 0,
-                'category_tags' => ['Poissons', 'Vivres', 'Textiles'],
+                'tag_names' => ['Poissons', 'Vivres', 'Textiles'],
                 'image' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600',
                 'cover_image' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200',
             ],
@@ -47,20 +47,34 @@ class DemoDataSeeder extends Seeder
                 'description' => 'Marché réputé pour ses légumes de montagne et son café.',
                 'total_places' => 80,
                 'occupied_places' => 0,
-                'category_tags' => ['Céréales', 'Fruits', 'Café'],
+                'tag_names' => ['Céréales', 'Fruits', 'Café'],
                 'image' => 'https://images.unsplash.com/photo-1506484381205-f7945653044d?w=600',
                 'cover_image' => 'https://images.unsplash.com/photo-1506484381205-f7945653044d?w=1200',
             ],
         ];
 
-        $categories = ['Poissons', 'Café & Thé', 'Fruits & Légumes', 'Textiles'];
+        $categories = [
+            'Poissons', 'Vivres', 'Textiles', 'Café & Thé', 'Fruits & Légumes',
+            'Céréales', 'Fruits', 'Café',
+        ];
 
         foreach ($categories as $catName) {
             ProductCategory::firstOrCreate(['name' => $catName], ['is_active' => true]);
         }
 
         foreach ($markets as $marketData) {
+            $tagNames = $marketData['tag_names'] ?? [];
+            unset($marketData['tag_names']);
+
             $market = Market::firstOrCreate(['name' => $marketData['name']], $marketData);
+
+            if ($tagNames) {
+                $categoryIds = ProductCategory::query()
+                    ->whereIn('name', $tagNames)
+                    ->pluck('id')
+                    ->all();
+                $market->productCategories()->sync($categoryIds);
+            }
 
             $admin = User::firstOrCreate(
                 ['email' => 'admin.'.strtolower($market->city).'@akaguriro.bi'],

@@ -22,6 +22,7 @@ class PlaceResource extends JsonResource
             'chief' => new UserResource($this->whenLoaded('chief')),
             'members' => PlaceMemberResource::collection($this->whenLoaded('members')),
             'market' => new MarketResource($this->whenLoaded('market')),
+            'block' => new MarketBlockResource($this->whenLoaded('block')),
             'created_at' => $this->created_at,
         ];
     }

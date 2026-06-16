@@ -70,10 +70,18 @@ class MarketService
             $data['cover_image'] = $this->fileStorage->store($coverImage, 'markets/covers');
         }
 
+        $categoryIds = $data['product_category_ids'] ?? null;
+        unset($data['product_category_ids']);
+
         $market = $this->marketRepository->create($data);
+
+        if (is_array($categoryIds)) {
+            $market->productCategories()->sync($categoryIds);
+        }
+
         $this->activityLog->log('market.created', $market);
 
-        return $market;
+        return $market->load('productCategories');
     }
 
     public function update(Market $market, array $data, ?UploadedFile $image = null, ?UploadedFile $coverImage = null): Market
@@ -88,10 +96,18 @@ class MarketService
             $data['cover_image'] = $this->fileStorage->store($coverImage, 'markets/covers');
         }
 
+        $categoryIds = $data['product_category_ids'] ?? null;
+        unset($data['product_category_ids']);
+
         $market = $this->marketRepository->update($market, $data);
+
+        if (is_array($categoryIds)) {
+            $market->productCategories()->sync($categoryIds);
+        }
+
         $this->activityLog->log('market.updated', $market);
 
-        return $market;
+        return $market->load('productCategories');
     }
 
     public function delete(Market $market): bool

@@ -16,6 +16,7 @@ class MarketBlockResource extends JsonResource
             'code' => $this->code,
             'description' => $this->description,
             'total_places' => $this->total_places,
+            'places_count' => $this->whenCounted('places'),
             'is_active' => $this->is_active,
         ];
     }

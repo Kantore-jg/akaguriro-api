@@ -34,7 +34,12 @@ class MarketResource extends JsonResource
             'occupied_places' => $this->occupied_places,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
-            'category_tags' => $this->category_tags ?? [],
+            'product_categories' => ProductCategoryResource::collection($this->whenLoaded('productCategories')),
+            'product_category_ids' => $this->whenLoaded(
+                'productCategories',
+                fn () => $this->productCategories->pluck('id')->values(),
+                [],
+            ),
             'is_active' => $this->is_active,
             'visit_count' => $this->visit_count,
             'places_count' => $this->whenCounted('places'),
