@@ -52,7 +52,10 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $data['user_id'] = $request->user()->id;
+
+        if (empty($data['user_id']) || ! $request->user()->can('manage_merchants')) {
+            $data['user_id'] = $request->user()->id;
+        }
 
         $product = $this->productService->create(
             $data,
@@ -73,6 +76,7 @@ class ProductController extends Controller
             'unit' => ['nullable', 'string', 'max:50'],
             'stock' => ['nullable', 'integer', 'min:0'],
             'available' => ['nullable', 'boolean'],
+            'is_trending' => ['nullable', 'boolean'],
             'category_id' => ['nullable', 'exists:product_categories,id'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:5120'],
