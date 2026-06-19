@@ -15,6 +15,7 @@ class RolePermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions = [
+            'manage_users',
             'manage_markets',
             'manage_places',
             'manage_merchants',
@@ -32,7 +33,7 @@ class RolePermissionSeeder extends Seeder
         $roles = [
             UserRole::SuperAdmin->value => $permissions,
             UserRole::AdminMarche->value => [
-                'manage_places', 'manage_merchants', 'manage_products',
+                'manage_users', 'manage_places', 'manage_merchants', 'manage_products',
                 'manage_receipts', 'manage_statistics', 'manage_announcements', 'manage_led',
             ],
             UserRole::Commercant->value => ['manage_products'],

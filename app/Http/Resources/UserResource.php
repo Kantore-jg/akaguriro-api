@@ -23,6 +23,25 @@ class UserResource extends JsonResource
             'roles' => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
             'permissions' => $this->whenLoaded('permissions', fn () => $this->getAllPermissions()->pluck('name')),
             'managed_market_id' => $this->managed_market_id,
+            'managed_market' => $this->whenLoaded('managedMarket', fn () => $this->managedMarket ? [
+                'id' => $this->managedMarket->id,
+                'name' => $this->managedMarket->name,
+            ] : null),
+            'active_market_id' => $this->when(
+                $this->relationLoaded('chiefPlaces'),
+                fn () => $this->chiefPlaces->first()?->market_id,
+            ),
+            'active_market' => $this->when(
+                $this->relationLoaded('chiefPlaces'),
+                function () {
+                    $market = $this->chiefPlaces->first()?->market;
+
+                    return $market ? [
+                        'id' => $market->id,
+                        'name' => $market->name,
+                    ] : null;
+                },
+            ),
             'created_at' => $this->created_at,
         ];
     }

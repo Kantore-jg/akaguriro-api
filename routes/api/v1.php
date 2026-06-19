@@ -10,6 +10,7 @@ use App\Http\Controllers\API\V1\PaymentReceiptController;
 use App\Http\Controllers\API\V1\PlaceController;
 use App\Http\Controllers\API\V1\PlaceRequestController;
 use App\Http\Controllers\API\V1\ProductController;
+use App\Http\Controllers\API\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -79,6 +80,13 @@ Route::prefix('v1')->group(function () {
             Route::get('receipts', [PaymentReceiptController::class, 'index']);
             Route::post('receipts/{receipt}/approve', [PaymentReceiptController::class, 'approve']);
             Route::post('receipts/{receipt}/reject', [PaymentReceiptController::class, 'reject']);
+        });
+
+        Route::middleware(['permission:manage_users'])->group(function () {
+            Route::get('users', [UserController::class, 'index']);
+            Route::post('users', [UserController::class, 'store']);
+            Route::put('users/{user}', [UserController::class, 'update']);
+            Route::delete('users/{user}', [UserController::class, 'destroy']);
         });
     });
 });
