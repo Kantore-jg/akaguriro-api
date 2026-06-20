@@ -19,9 +19,12 @@ class PaymentReceiptController extends Controller
     {
         $this->authorize('viewAny', PaymentReceipt::class);
 
-        $receipts = $this->receiptService->list($request->only([
-            'status', 'user_id',
-        ]), (int) $request->get('per_page', 50));
+        $filters = $request->only(['status', 'user_id', 'market_id']);
+        if ($request->user()->managed_market_id && ! $request->user()->can('manage_markets')) {
+            $filters['market_id'] = $request->user()->managed_market_id;
+        }
+
+        $receipts = $this->receiptService->list($filters, (int) $request->get('per_page', 50));
 
         return ApiResponse::success(PaymentReceiptResource::collection($receipts));
     }

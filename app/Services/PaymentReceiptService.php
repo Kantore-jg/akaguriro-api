@@ -28,6 +28,10 @@ class PaymentReceiptService
             $query->where('user_id', $filters['user_id']);
         }
 
+        if (! empty($filters['market_id'])) {
+            $query->where('market_id', $filters['market_id']);
+        }
+
         return $query->latest()->paginate($perPage);
     }
 
