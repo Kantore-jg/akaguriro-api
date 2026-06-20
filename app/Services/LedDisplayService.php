@@ -98,7 +98,6 @@ class LedDisplayService
             'category' => $place?->category ?? 'Commerce Général',
             'active_place_number' => $place?->number,
             'active_market_id' => $place?->market_id,
-            'rating' => 4.8,
             'products_count' => $user->products_count ?? 0,
         ];
     }

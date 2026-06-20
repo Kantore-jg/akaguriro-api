@@ -20,7 +20,6 @@ class MerchantResource extends JsonResource
             'phone' => $this->phone,
             'image' => $storage->url($this->avatar) ?? $this->avatar,
             'category' => $chiefPlace?->category ?? 'Commerce Général',
-            'rating' => 4.8,
             'active_place_id' => $chiefPlace?->id,
             'active_place_number' => $chiefPlace?->number,
             'active_market_id' => $chiefPlace?->market_id,
