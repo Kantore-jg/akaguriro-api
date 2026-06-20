@@ -8,6 +8,7 @@ use App\Repositories\Contracts\MarketRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 
 class MarketService
 {
@@ -112,6 +113,24 @@ class MarketService
 
     public function delete(Market $market): bool
     {
+        if ($market->places()->exists()) {
+            throw ValidationException::withMessages([
+                'market' => ['Ce marché contient encore des emplacements. Supprimez-les d\'abord.'],
+            ]);
+        }
+
+        if ($market->products()->exists()) {
+            throw ValidationException::withMessages([
+                'market' => ['Ce marché contient encore des produits. Retirez-les d\'abord.'],
+            ]);
+        }
+
+        if ($market->admins()->exists()) {
+            throw ValidationException::withMessages([
+                'market' => ['Ce marché est encore géré par un administrateur. Réaffectez-le d\'abord.'],
+            ]);
+        }
+
         $this->activityLog->log('market.deleted', $market);
 
         return $this->marketRepository->delete($market);
