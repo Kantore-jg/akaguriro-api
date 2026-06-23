@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Enums\UserRole;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -18,10 +17,10 @@ class AuthService
             'phone' => $data['phone'] ?? null,
             'password' => $data['password'],
             'avatar' => $data['avatar'] ?? null,
+            'email_verified_at' => now(),
         ]);
 
         $user->assignRole(UserRole::User->value);
-        event(new Registered($user));
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
