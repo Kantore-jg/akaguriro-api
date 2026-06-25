@@ -10,6 +10,7 @@ use App\Http\Controllers\API\V1\PaymentReceiptController;
 use App\Http\Controllers\API\V1\PlaceController;
 use App\Http\Controllers\API\V1\PlaceRequestController;
 use App\Http\Controllers\API\V1\ProductController;
+use App\Http\Controllers\API\V1\SaleController;
 use App\Http\Controllers\API\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,10 @@ Route::prefix('v1')->group(function () {
         Route::post('receipts', [PaymentReceiptController::class, 'store']);
         Route::get('my/receipts', [PaymentReceiptController::class, 'mine']);
 
+        Route::post('sales', [SaleController::class, 'store']);
+        Route::get('my/sales', [SaleController::class, 'mine']);
+        Route::get('sales/{sale}', [SaleController::class, 'show']);
+
         Route::post('products', [ProductController::class, 'store']);
         Route::put('products/{product}', [ProductController::class, 'update']);
         Route::delete('products/{product}', [ProductController::class, 'destroy']);
@@ -82,11 +87,22 @@ Route::prefix('v1')->group(function () {
             Route::post('receipts/{receipt}/reject', [PaymentReceiptController::class, 'reject']);
         });
 
+        Route::middleware(['permission:manage_sales'])->group(function () {
+            Route::get('sales', [SaleController::class, 'index']);
+        });
+
         Route::middleware(['permission:manage_users'])->group(function () {
             Route::get('users', [UserController::class, 'index']);
             Route::post('users', [UserController::class, 'store']);
             Route::put('users/{user}', [UserController::class, 'update']);
             Route::delete('users/{user}', [UserController::class, 'destroy']);
+        });
+
+        Route::middleware(['permission:manage_categories'])->group(function () {
+            Route::get('product-categories/manage', [ProductCategoryController::class, 'manage']);
+            Route::post('product-categories', [ProductCategoryController::class, 'store']);
+            Route::put('product-categories/{productCategory}', [ProductCategoryController::class, 'update']);
+            Route::delete('product-categories/{productCategory}', [ProductCategoryController::class, 'destroy']);
         });
     });
 });

@@ -20,7 +20,9 @@ class RolePermissionSeeder extends Seeder
             'manage_places',
             'manage_merchants',
             'manage_products',
+            'manage_categories',
             'manage_receipts',
+            'manage_sales',
             'manage_statistics',
             'manage_announcements',
             'manage_led',
@@ -33,10 +35,10 @@ class RolePermissionSeeder extends Seeder
         $roles = [
             UserRole::SuperAdmin->value => $permissions,
             UserRole::AdminMarche->value => [
-                'manage_users', 'manage_places', 'manage_merchants', 'manage_products',
-                'manage_receipts', 'manage_statistics', 'manage_announcements', 'manage_led',
+                'manage_users', 'manage_places', 'manage_merchants', 'manage_products', 'manage_categories',
+                'manage_receipts', 'manage_sales', 'manage_statistics', 'manage_announcements', 'manage_led',
             ],
-            UserRole::Commercant->value => ['manage_products'],
+            UserRole::Commercant->value => ['manage_products', 'manage_sales'],
             UserRole::User->value => [],
         ];
 
