@@ -17,6 +17,7 @@ class PlaceResource extends JsonResource
             'qr_code' => $this->qr_code,
             'status' => $this->status,
             'category' => $this->category,
+            'product_category_ids' => $this->product_category_ids ?? [],
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'chief' => new UserResource($this->whenLoaded('chief')),

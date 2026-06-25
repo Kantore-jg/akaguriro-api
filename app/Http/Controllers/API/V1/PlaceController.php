@@ -47,7 +47,8 @@ class PlaceController extends Controller
 
         $data = $request->validate([
             'status' => ['sometimes', 'string'],
-            'category' => ['nullable', 'string', 'max:100'],
+            'product_category_ids' => ['sometimes', 'array', 'min:1'],
+            'product_category_ids.*' => ['integer', 'exists:product_categories,id'],
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
         ]);

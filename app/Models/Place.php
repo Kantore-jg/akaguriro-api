@@ -14,13 +14,14 @@ class Place extends Model
 
     protected $fillable = [
         'market_id', 'market_block_id', 'number', 'qr_code', 'status',
-        'category', 'latitude', 'longitude', 'chief_user_id',
+        'category', 'product_category_ids', 'latitude', 'longitude', 'chief_user_id',
     ];
 
     protected function casts(): array
     {
         return [
             'status' => PlaceStatus::class,
+            'product_category_ids' => 'array',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];
