@@ -17,6 +17,7 @@ class PlaceRequestResource extends JsonResource
             'merchant_name' => $this->merchant_name,
             'merchant_phone' => $this->merchant_phone,
             'category' => $this->category,
+            'product_category_ids' => $this->product_category_ids ?? [],
             'description' => $this->description,
             'status' => $this->status,
             'rejection_reason' => $this->rejection_reason,

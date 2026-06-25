@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Enums\PlaceRequestStatus;
 use App\Enums\PlaceStatus;
 use App\Enums\UserRole;
+use App\Models\Market;
 use App\Models\Place;
 use App\Models\PlaceRequest;
+use App\Models\ProductCategory;
 use App\Models\User;
 use App\Notifications\PlaceRequestReviewedNotification;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -41,8 +43,37 @@ class PlaceRequestService
 
     public function create(User $user, array $data): PlaceRequest
     {
+        $market = Market::with('productCategories')->findOrFail($data['market_id']);
+        $allowedIds = $market->productCategories->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $categoryIds = array_values(array_unique(array_map('intval', $data['product_category_ids'] ?? [])));
+
+        if (empty($categoryIds)) {
+            throw ValidationException::withMessages([
+                'product_category_ids' => ['Sélectionnez au moins une catégorie.'],
+            ]);
+        }
+
+        foreach ($categoryIds as $categoryId) {
+            if (! in_array($categoryId, $allowedIds, true)) {
+                throw ValidationException::withMessages([
+                    'product_category_ids' => ['Une ou plusieurs catégories ne sont pas autorisées pour ce marché.'],
+                ]);
+            }
+        }
+
+        $categoryNames = ProductCategory::query()
+            ->whereIn('id', $categoryIds)
+            ->orderBy('name')
+            ->pluck('name')
+            ->all();
+
         $request = PlaceRequest::create([
-            ...$data,
+            'market_id' => $data['market_id'],
+            'merchant_name' => $data['merchant_name'],
+            'merchant_phone' => $data['merchant_phone'],
+            'description' => $data['description'] ?? null,
+            'category' => implode(', ', $categoryNames),
+            'product_category_ids' => $categoryIds,
             'user_id' => $user->id,
             'status' => PlaceRequestStatus::Pending,
             'history' => [[

@@ -10,7 +10,7 @@ class PlaceRequest extends Model
 {
     protected $fillable = [
         'user_id', 'market_id', 'place_id', 'merchant_name', 'merchant_phone',
-        'category', 'description', 'status', 'reviewed_by', 'reviewed_at',
+        'category', 'product_category_ids', 'description', 'status', 'reviewed_by', 'reviewed_at',
         'rejection_reason', 'history',
     ];
 
@@ -20,6 +20,7 @@ class PlaceRequest extends Model
             'status' => PlaceRequestStatus::class,
             'reviewed_at' => 'datetime',
             'history' => 'array',
+            'product_category_ids' => 'array',
         ];
     }
 
