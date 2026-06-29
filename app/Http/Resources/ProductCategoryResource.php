@@ -15,6 +15,7 @@ class ProductCategoryResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'products_count' => $this->whenCounted('products'),
+            'markets_count' => $this->whenCounted('markets'),
         ];
     }
 }

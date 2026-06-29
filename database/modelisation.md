@@ -93,7 +93,7 @@ Table roles {
     (name, guard_name) [unique]
   }
 
-  Note: 'SUPER_ADMIN, ADMIN_MARCHE, COMMERCANT, etc.'
+  Note: 'SUPER_ADMIN, ADMIN_MARCHE, COMMERCANT, USER. Permissions clés : manage_users, manage_markets, manage_places, manage_merchants, manage_products, manage_categories, manage_receipts, manage_sales, manage_statistics, manage_announcements, manage_led'
 }
 
 Table model_has_permissions {
@@ -205,6 +205,7 @@ Table places {
   qr_code varchar [unique]
   status varchar [not null, default: 'available']
   category varchar
+  product_category_ids json
   latitude decimal(10,7)
   longitude decimal(10,7)
   created_at timestamp
@@ -217,7 +218,7 @@ Table places {
     status
   }
 
-  Note: 'Status : available | occupied | maintenance | reserved'
+  Note: 'Status : available | occupied | maintenance | reserved. category = libellés dénormalisés (noms séparés par virgule). product_category_ids = sélection multiple des catégories autorisées sur le marché (IDs product_categories). Création : market_block_id requis, au moins 1 catégorie.'
 }
 
 Table place_members {
@@ -243,6 +244,7 @@ Table place_requests {
   merchant_name varchar [not null]
   merchant_phone varchar [not null]
   category varchar
+  product_category_ids json
   description text
   status varchar [not null, default: 'pending']
   rejection_reason text
@@ -256,7 +258,7 @@ Table place_requests {
     user_id
   }
 
-  Note: 'Status : pending | approved | rejected'
+  Note: 'Status : pending | approved | rejected | assigned. category = libellés dénormalisés. product_category_ids = catégories choisies par le candidat (multiselect, min. 1, limitées aux catégories du marché).'
 }
 
 // ============================================================
@@ -283,6 +285,8 @@ Table product_categories {
   indexes {
     (parent_id, is_active)
   }
+
+  Note: 'Référentiel global des catégories. CRUD admin via permission manage_categories (SUPER_ADMIN, ADMIN_MARCHE). API publique : lecture des actives. API admin : name + description à l''écriture. parent_id, icon, is_active conservés en base mais hors UI/API admin actuelle. Lié aux marchés via market_product_category.'
 }
 
 Table products {
@@ -326,6 +330,52 @@ Table product_images {
   indexes {
     (product_id, is_primary)
   }
+}
+
+// ============================================================
+// VENTES
+// ============================================================
+
+TableGroup sales_domain {
+  sales
+  sale_items
+}
+
+Table sales {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  market_id bigint [not null]
+  place_id bigint
+  invoice_number varchar [not null, unique]
+  client_name varchar [not null]
+  client_phone varchar
+  client_email varchar
+  payment_type varchar(20) [not null]
+  subtotal decimal(12,2) [not null]
+  total decimal(12,2) [not null]
+  notes text
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (market_id, created_at)
+    (user_id, created_at)
+  }
+
+  Note: 'Factures de vente enregistrées par les commerçants / admins'
+}
+
+Table sale_items {
+  id bigint [pk, increment]
+  sale_id bigint [not null]
+  product_id bigint
+  product_name varchar [not null]
+  product_unit varchar [not null, default: 'unit']
+  unit_price decimal(12,2) [not null]
+  quantity int [not null]
+  line_total decimal(12,2) [not null]
+  created_at timestamp
+  updated_at timestamp
 }
 
 // ============================================================
@@ -506,6 +556,12 @@ Ref: products.market_id > markets.id [delete: cascade]
 Ref: products.place_id > places.id [delete: set null]
 Ref: products.category_id > product_categories.id [delete: set null]
 Ref: product_images.product_id > products.id [delete: cascade]
+
+Ref: sales.user_id > users.id [delete: cascade]
+Ref: sales.market_id > markets.id [delete: cascade]
+Ref: sales.place_id > places.id [delete: set null]
+Ref: sale_items.sale_id > sales.id [delete: cascade]
+Ref: sale_items.product_id > products.id [delete: set null]
 
 Ref: payment_receipts.user_id > users.id [delete: cascade]
 Ref: payment_receipts.market_id > markets.id [delete: set null]
