@@ -63,6 +63,8 @@ class MarketService
 
     public function create(array $data, ?UploadedFile $image = null, ?UploadedFile $coverImage = null): Market
     {
+        $data['city'] = $data['city'] ?? ($data['province'] ?? null);
+
         if ($image) {
             $data['image'] = $this->fileStorage->store($image, 'markets/images');
         }
@@ -87,6 +89,8 @@ class MarketService
 
     public function update(Market $market, array $data, ?UploadedFile $image = null, ?UploadedFile $coverImage = null): Market
     {
+        $data['city'] = $data['city'] ?? ($data['province'] ?? $market->city);
+
         if ($image) {
             $this->fileStorage->delete($market->image);
             $data['image'] = $this->fileStorage->store($image, 'markets/images');

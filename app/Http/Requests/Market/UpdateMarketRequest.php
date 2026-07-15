@@ -15,6 +15,10 @@ class UpdateMarketRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'string', 'max:255'],
+            'province' => ['sometimes', 'string', 'max:100'],
+            'commune' => ['sometimes', 'string', 'max:100'],
+            'zone' => ['sometimes', 'string', 'max:100'],
+            'colline' => ['sometimes', 'string', 'max:100'],
             'city' => ['sometimes', 'string', 'max:100'],
             'location' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],

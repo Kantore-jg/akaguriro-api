@@ -31,7 +31,11 @@ class DemoDataSeeder extends Seeder
         $markets = [
             [
                 'name' => 'Marché Siyoni de Bujumbura',
-                'city' => 'Bujumbura',
+                'city' => 'BUJUMBURA',
+                'province' => 'BUJUMBURA',
+                'commune' => 'Mukaza',
+                'zone' => 'Rohero',
+                'colline' => 'Jabe',
                 'location' => 'Quartier Jabe, Avenue du Peuple Murundi',
                 'description' => 'Le plus grand centre commercial populaire de Bujumbura.',
                 'total_places' => 120,
@@ -42,7 +46,11 @@ class DemoDataSeeder extends Seeder
             ],
             [
                 'name' => 'Marché Central de Gitega',
-                'city' => 'Gitega',
+                'city' => 'GITEGA',
+                'province' => 'GITEGA',
+                'commune' => 'Gitega',
+                'zone' => 'Nyamugari',
+                'colline' => 'Centre-ville',
                 'location' => 'Centre-ville, Boulevard de la Nation',
                 'description' => 'Marché réputé pour ses légumes de montagne et son café.',
                 'total_places' => 80,

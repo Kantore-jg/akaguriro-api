@@ -14,7 +14,7 @@ class Market extends Model
     use HasFactory, HasSlug, SoftDeletes;
 
     protected $fillable = [
-        'name', 'slug', 'city', 'location', 'description',
+        'name', 'slug', 'city', 'province', 'commune', 'zone', 'colline', 'location', 'description',
         'image', 'cover_image', 'total_places', 'occupied_places',
         'latitude', 'longitude', 'is_active', 'visit_count',
     ];

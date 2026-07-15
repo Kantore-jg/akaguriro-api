@@ -15,7 +15,9 @@ class MarketRepository implements MarketRepositoryInterface
             ->with(['productCategories'])
             ->withCount(['places', 'products']);
 
-        if (! empty($filters['city'])) {
+        if (! empty($filters['province'])) {
+            $query->where('province', $filters['province']);
+        } elseif (! empty($filters['city'])) {
             $query->where('city', $filters['city']);
         }
 
@@ -23,6 +25,10 @@ class MarketRepository implements MarketRepositoryInterface
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('province', 'like', "%{$search}%")
+                    ->orWhere('commune', 'like', "%{$search}%")
+                    ->orWhere('zone', 'like', "%{$search}%")
+                    ->orWhere('colline', 'like', "%{$search}%")
                     ->orWhere('city', 'like', "%{$search}%")
                     ->orWhere('location', 'like', "%{$search}%");
             });

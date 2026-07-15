@@ -15,7 +15,11 @@ class StoreMarketRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:100'],
+            'province' => ['required', 'string', 'max:100'],
+            'commune' => ['required', 'string', 'max:100'],
+            'zone' => ['required', 'string', 'max:100'],
+            'colline' => ['required', 'string', 'max:100'],
+            'city' => ['nullable', 'string', 'max:100'],
             'location' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'total_places' => ['nullable', 'integer', 'min:0'],

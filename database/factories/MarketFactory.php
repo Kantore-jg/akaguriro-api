@@ -14,9 +14,15 @@ class MarketFactory extends Factory
 
     public function definition(): array
     {
+        $province = fake()->randomElement(['BUJUMBURA', 'GITEGA', 'BUHUMUZA', 'BURUNGA', 'BUTANYERERA']);
+
         return [
             'name' => fake()->company().' Market',
-            'city' => fake()->city(),
+            'city' => $province,
+            'province' => $province,
+            'commune' => fake()->word(),
+            'zone' => fake()->word(),
+            'colline' => fake()->word(),
             'location' => fake()->address(),
             'description' => fake()->paragraph(),
             'total_places' => fake()->numberBetween(20, 200),

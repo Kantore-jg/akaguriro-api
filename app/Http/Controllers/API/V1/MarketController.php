@@ -19,7 +19,7 @@ class MarketController extends Controller
     public function index(Request $request): JsonResponse
     {
         $markets = $this->marketService->list($request->only([
-            'search', 'city', 'is_active', 'sort', 'direction',
+            'search', 'province', 'city', 'is_active', 'sort', 'direction',
         ]), (int) $request->get('per_page', 15));
 
         return ApiResponse::success(MarketResource::collection($markets));

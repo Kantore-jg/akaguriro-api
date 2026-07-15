@@ -22,7 +22,7 @@ class MarketApiTest extends TestCase
 
     public function test_can_list_markets(): void
     {
-        Market::factory()->create(['name' => 'Test Market', 'city' => 'Bujumbura']);
+        Market::factory()->create(['name' => 'Test Market', 'province' => 'BUJUMBURA', 'city' => 'BUJUMBURA']);
 
         $response = $this->getJson('/api/v1/markets');
 
@@ -40,7 +40,10 @@ class MarketApiTest extends TestCase
 
         $response = $this->postJson('/api/v1/markets', [
             'name' => 'Nouveau Marché',
-            'city' => 'Ngozi',
+            'province' => 'BUJUMBURA',
+            'commune' => 'Mukaza',
+            'zone' => 'Rohero',
+            'colline' => 'Jabe',
             'description' => 'Marché test',
         ]);
 
@@ -55,7 +58,8 @@ class MarketApiTest extends TestCase
         $user->assignRole('SUPER_ADMIN');
         $market = Market::factory()->create([
             'name' => 'Marché Initial',
-            'city' => 'Bujumbura',
+            'province' => 'BUJUMBURA',
+            'city' => 'BUJUMBURA',
             'total_places' => 40,
         ]);
 
@@ -63,20 +67,23 @@ class MarketApiTest extends TestCase
 
         $response = $this->putJson("/api/v1/markets/{$market->id}", [
             'name' => 'Marché Mis à Jour',
-            'city' => 'Gitega',
+            'province' => 'GITEGA',
+            'commune' => 'Gitega',
+            'zone' => 'Nyamugari',
+            'colline' => 'Centre-ville',
             'total_places' => 60,
         ]);
 
         $response->assertOk()
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.name', 'Marché Mis à Jour')
-            ->assertJsonPath('data.city', 'Gitega')
+            ->assertJsonPath('data.province', 'GITEGA')
             ->assertJsonPath('data.total_places', 60);
 
         $this->assertDatabaseHas('markets', [
             'id' => $market->id,
             'name' => 'Marché Mis à Jour',
-            'city' => 'Gitega',
+            'province' => 'GITEGA',
             'total_places' => 60,
         ]);
     }
@@ -127,7 +134,10 @@ class MarketApiTest extends TestCase
 
         $response = $this->postJson('/api/v1/markets', [
             'name' => 'Marché Interdit',
-            'city' => 'Ngozi',
+            'province' => 'BUJUMBURA',
+            'commune' => 'Mukaza',
+            'zone' => 'Rohero',
+            'colline' => 'Jabe',
         ]);
 
         $response->assertForbidden();
