@@ -12,7 +12,7 @@ class Sale extends Model
     protected $fillable = [
         'user_id', 'market_id', 'place_id', 'invoice_number',
         'client_name', 'client_phone', 'client_email',
-        'payment_type', 'subtotal', 'total', 'notes',
+        'payment_type', 'subtotal', 'total', 'paid_amount', 'notes',
     ];
 
     protected function casts(): array
@@ -21,6 +21,7 @@ class Sale extends Model
             'payment_type' => PaymentType::class,
             'subtotal' => 'decimal:2',
             'total' => 'decimal:2',
+            'paid_amount' => 'decimal:2',
         ];
     }
 

@@ -97,6 +97,22 @@ class SaleService
                 ];
             }
 
+            $subtotal = round($subtotal, 2);
+            $paidAmount = round((float) ($data['paid_amount'] ?? $subtotal), 2);
+            $paymentType = PaymentType::from($data['payment_type']);
+
+            if ($paidAmount > $subtotal) {
+                throw ValidationException::withMessages([
+                    'paid_amount' => ['Le montant payé ne peut pas dépasser le total de la vente.'],
+                ]);
+            }
+
+            if ($paymentType !== PaymentType::Credit && abs($paidAmount - $subtotal) > 0.01) {
+                throw ValidationException::withMessages([
+                    'paid_amount' => ['Les paiements en espèces ou par carte doivent être réglés en totalité. Utilisez le mode crédit pour un paiement partiel.'],
+                ]);
+            }
+
             $sale = Sale::create([
                 'user_id' => $merchant->id,
                 'market_id' => $data['market_id'],
@@ -105,9 +121,10 @@ class SaleService
                 'client_name' => $data['client_name'],
                 'client_phone' => $data['client_phone'] ?? null,
                 'client_email' => $data['client_email'] ?? null,
-                'payment_type' => PaymentType::from($data['payment_type']),
+                'payment_type' => $paymentType,
                 'subtotal' => $subtotal,
                 'total' => $subtotal,
+                'paid_amount' => $paidAmount,
                 'notes' => $data['notes'] ?? null,
             ]);
 

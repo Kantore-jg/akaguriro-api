@@ -6,4 +6,5 @@ enum PaymentType: string
 {
     case Cash = 'cash';
     case Electronic = 'electronic';
+    case Credit = 'credit';
 }

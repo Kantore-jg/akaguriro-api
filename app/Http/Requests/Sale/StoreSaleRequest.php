@@ -24,6 +24,7 @@ class StoreSaleRequest extends FormRequest
             'client_phone' => ['nullable', 'string', 'max:30'],
             'client_email' => ['nullable', 'email', 'max:255'],
             'payment_type' => ['required', Rule::enum(PaymentType::class)],
+            'paid_amount' => ['required', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],

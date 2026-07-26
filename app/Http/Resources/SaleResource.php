@@ -9,6 +9,9 @@ class SaleResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $paidAmount = $this->paid_amount !== null ? (float) $this->paid_amount : (float) $this->total;
+        $remainingAmount = max(((float) $this->total) - $paidAmount, 0);
+
         return [
             'id' => $this->id,
             'invoice_number' => $this->invoice_number,
@@ -21,6 +24,8 @@ class SaleResource extends JsonResource
             'payment_type' => $this->payment_type?->value,
             'subtotal' => $this->subtotal,
             'total' => $this->total,
+            'paid_amount' => $paidAmount,
+            'remaining_amount' => $remainingAmount,
             'notes' => $this->notes,
             'created_at' => $this->created_at?->toIso8601String(),
             'merchant' => $this->whenLoaded('merchant', fn () => [
