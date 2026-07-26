@@ -157,14 +157,33 @@ class UserApiTest extends TestCase
         $admin->assignRole('ADMIN_MARCHE');
         Sanctum::actingAs($admin);
 
-        $this->postJson('/api/v1/users', [
+        $response = $this->postJson('/api/v1/users', [
             'name' => 'Commerçant Local',
             'email' => 'commercant.local@akaguriro.bi',
             'password' => 'password123',
             'role' => 'COMMERCANT',
         ])
             ->assertCreated()
-            ->assertJsonPath('data.roles.0', 'COMMERCANT');
+            ->assertJsonPath('data.roles.0', 'COMMERCANT')
+            ->assertJsonPath('data.managed_market_id', $market->id);
+
+        $createdId = $response->json('data.id');
+
+        $this->getJson('/api/v1/users')
+            ->assertOk()
+            ->assertJsonFragment(['id' => $createdId, 'managed_market_id' => $market->id]);
+
+        $this->putJson("/api/v1/users/{$createdId}", [
+            'name' => 'Commerçant Local Modifié',
+            'is_active' => false,
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.name', 'Commerçant Local Modifié')
+            ->assertJsonPath('data.managed_market_id', $market->id);
+
+        $this->deleteJson("/api/v1/users/{$createdId}")
+            ->assertOk()
+            ->assertJsonPath('success', true);
     }
 
     public function test_create_rejects_duplicate_phone(): void

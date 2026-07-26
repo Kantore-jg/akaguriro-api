@@ -56,12 +56,21 @@ class UserService
     public function create(array $data, ?User $actor = null): User
     {
         $role = $data['role'] ?? UserRole::User->value;
+        $managedMarketId = $data['managed_market_id'] ?? null;
 
         if ($actor) {
             $this->assertCanAssignRole($actor, $role);
+
+            if (
+                $actor->hasRole(UserRole::AdminMarche->value)
+                && $actor->managed_market_id
+                && in_array($role, self::MARKET_ADMIN_MANAGEABLE_ROLES, true)
+            ) {
+                $managedMarketId = (int) $actor->managed_market_id;
+            }
         }
 
-        $this->validateRoleConstraints($role, $data['managed_market_id'] ?? null);
+        $this->validateRoleConstraints($role, $managedMarketId);
 
         $user = User::create([
             'name' => $data['name'],
@@ -69,9 +78,7 @@ class UserService
             'phone' => $data['phone'] ?? null,
             'password' => $data['password'],
             'is_active' => $data['is_active'] ?? true,
-            'managed_market_id' => $role === UserRole::AdminMarche->value
-                ? ($data['managed_market_id'] ?? null)
-                : null,
+            'managed_market_id' => $managedMarketId,
         ]);
 
         $user->syncRoles([$role]);
@@ -89,6 +96,14 @@ class UserService
         $managedMarketId = $role === UserRole::AdminMarche->value
             ? ($data['managed_market_id'] ?? $user->managed_market_id)
             : null;
+
+        if (
+            $actor->hasRole(UserRole::AdminMarche->value)
+            && $actor->managed_market_id
+            && in_array($role, self::MARKET_ADMIN_MANAGEABLE_ROLES, true)
+        ) {
+            $managedMarketId = (int) $actor->managed_market_id;
+        }
 
         $this->validateRoleConstraints($role, $managedMarketId);
 
@@ -179,7 +194,8 @@ class UserService
                     ->orWhere(function ($q2) use ($marketId) {
                         $q2->whereHas('roles', fn ($r) => $r->whereIn('name', self::MARKET_ADMIN_MANAGEABLE_ROLES))
                             ->where(function ($q3) use ($marketId) {
-                                $q3->whereHas('chiefPlaces', fn ($p) => $p->where('market_id', $marketId))
+                                $q3->where('managed_market_id', $marketId)
+                                    ->orWhereHas('chiefPlaces', fn ($p) => $p->where('market_id', $marketId))
                                     ->orWhereHas('placeRequests', fn ($r) => $r->where('market_id', $marketId));
                             });
                     });
@@ -223,6 +239,10 @@ class UserService
 
     private function isLinkedToMarket(User $user, int $marketId): bool
     {
+        if ((int) $user->managed_market_id === (int) $marketId) {
+            return true;
+        }
+
         if ($user->chiefPlaces()->where('market_id', $marketId)->exists()) {
             return true;
         }
