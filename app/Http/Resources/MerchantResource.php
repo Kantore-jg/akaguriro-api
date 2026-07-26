@@ -12,6 +12,7 @@ class MerchantResource extends JsonResource
     {
         $storage = app(FileStorageService::class);
         $chiefPlace = $this->chiefPlaces->first();
+        $activeMarketId = $chiefPlace?->market_id ?? $this->managed_market_id;
 
         return [
             'id' => $this->id,
@@ -22,7 +23,8 @@ class MerchantResource extends JsonResource
             'category' => $chiefPlace?->category ?? 'Commerce Général',
             'active_place_id' => $chiefPlace?->id,
             'active_place_number' => $chiefPlace?->number,
-            'active_market_id' => $chiefPlace?->market_id,
+            'active_market_id' => $activeMarketId,
+            'managed_market_id' => $this->managed_market_id,
             'joined_date' => $this->created_at?->toDateString(),
             'verified' => (bool) $this->email_verified_at,
             'bio' => null,
