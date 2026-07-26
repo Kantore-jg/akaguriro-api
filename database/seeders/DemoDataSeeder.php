@@ -96,10 +96,17 @@ class DemoDataSeeder extends Seeder
             );
             $admin->assignRole(UserRole::AdminMarche->value);
 
+            $marketCategoryIds = $market->productCategories()->pluck('id')->all();
+            $marketCategoryNames = $market->productCategories()->pluck('name')->all();
+
             for ($i = 1; $i <= 5; $i++) {
                 Place::firstOrCreate(
                     ['market_id' => $market->id, 'number' => 'A-'.str_pad((string) $i, 2, '0', STR_PAD_LEFT)],
-                    ['status' => PlaceStatus::Available, 'category' => 'Commerce Général']
+                    [
+                        'status' => PlaceStatus::Available,
+                        'product_category_ids' => $marketCategoryIds ?: null,
+                        'category' => $marketCategoryNames ? implode(', ', $marketCategoryNames) : null,
+                    ]
                 );
             }
         }
