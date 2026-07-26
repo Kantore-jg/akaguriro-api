@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Place\AssignChiefRequest;
 use App\Http\Requests\Place\UpdatePlaceRequest;
 use App\Http\Requests\Place\StorePlaceRequest;
 use App\Http\Resources\PlaceResource;
@@ -51,12 +52,11 @@ class PlaceController extends Controller
         return ApiResponse::success(new PlaceResource($place), 'Place mise à jour');
     }
 
-    public function assignChief(Request $request, Place $place): JsonResponse
+    public function assignChief(AssignChiefRequest $request, Place $place): JsonResponse
     {
         $this->authorize('update', $place);
 
-        $data = $request->validate(['user_id' => ['required', 'exists:users,id']]);
-        $user = User::findOrFail($data['user_id']);
+        $user = User::findOrFail($request->validated('user_id'));
         $place = $this->placeService->assignChief($place, $user);
 
         return ApiResponse::success(new PlaceResource($place), 'Chef de place assigné');
