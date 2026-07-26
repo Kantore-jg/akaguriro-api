@@ -40,7 +40,7 @@ class AssignChiefRequest extends FormRequest
                 }
             }
 
-            $targetUser = User::with(['chiefPlaces', 'placeRequests'])->find($this->input('user_id'));
+            $targetUser = User::with(['chiefPlaces', 'placeRequests', 'managedMarket'])->find($this->input('user_id'));
             if (! $targetUser || ! $actor->managed_market_id || $actor->can('manage_markets')) {
                 return;
             }
@@ -50,7 +50,7 @@ class AssignChiefRequest extends FormRequest
                 fn (Place $chiefPlace) => (int) $chiefPlace->market_id === $marketId
             ) || $targetUser->placeRequests->contains(
                 fn ($request) => (int) $request->market_id === $marketId
-            );
+            ) || (int) $targetUser->managed_market_id === $marketId;
 
             if (! $linkedToMarket) {
                 $validator->errors()->add(

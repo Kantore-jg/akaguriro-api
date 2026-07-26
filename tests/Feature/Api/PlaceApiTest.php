@@ -73,4 +73,46 @@ class PlaceApiTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['place_id']);
     }
+
+    public function test_market_admin_can_assign_chief_for_commercant_created_in_same_market(): void
+    {
+        $market = Market::factory()->create();
+        $block = MarketBlock::create([
+            'market_id' => $market->id,
+            'name' => 'Bloc A',
+            'code' => 'A',
+            'description' => 'Bloc de test',
+            'total_places' => 2,
+            'is_active' => true,
+        ]);
+        $category = ProductCategory::create([
+            'name' => 'Commerce Général',
+            'is_active' => true,
+        ]);
+
+        $place = Place::create([
+            'market_id' => $market->id,
+            'market_block_id' => $block->id,
+            'number' => 'A-01',
+            'status' => PlaceStatus::Available->value,
+            'product_category_ids' => [$category->id],
+            'category' => $category->name,
+            'qr_code' => 'TEST-PLACE-A-01',
+        ]);
+
+        $admin = User::factory()->create(['managed_market_id' => $market->id]);
+        $admin->assignRole('ADMIN_MARCHE');
+        Sanctum::actingAs($admin);
+
+        $merchant = User::factory()->create(['managed_market_id' => $market->id]);
+        $merchant->assignRole('COMMERCANT');
+
+        $this->postJson("/api/v1/places/{$place->id}/assign-chief", [
+            'user_id' => $merchant->id,
+        ])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.chief.id', $merchant->id)
+            ->assertJsonPath('data.status', 'occupée');
+    }
 }
