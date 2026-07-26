@@ -9,7 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class StorePlaceRequest extends FormRequest
+class UpdatePlaceRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -18,12 +18,16 @@ class StorePlaceRequest extends FormRequest
 
     public function rules(): array
     {
+        $placeId = $this->route('place')?->id;
+
         return [
             'market_id' => ['required', 'exists:markets,id'],
             'market_block_id' => ['required', 'exists:market_blocks,id'],
             'number' => [
                 'required', 'string', 'max:50',
-                Rule::unique('places')->where(fn ($q) => $q->where('market_id', $this->market_id)),
+                Rule::unique('places')
+                    ->where(fn ($q) => $q->where('market_id', $this->market_id))
+                    ->ignore($placeId),
             ],
             'product_category_ids' => ['required', 'array', 'min:1'],
             'product_category_ids.*' => ['integer', 'exists:product_categories,id'],
@@ -43,7 +47,7 @@ class StorePlaceRequest extends FormRequest
                 if ($marketId !== (int) $user->managed_market_id) {
                     $validator->errors()->add(
                         'market_id',
-                        'Vous ne pouvez créer des emplacements que pour votre marché assigné.',
+                        'Vous ne pouvez modifier des emplacements que pour votre marché assigné.',
                     );
                 }
             }

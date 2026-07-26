@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Place\UpdatePlaceRequest;
 use App\Http\Requests\Place\StorePlaceRequest;
 use App\Http\Resources\PlaceResource;
 use App\Models\Place;
@@ -41,19 +42,11 @@ class PlaceController extends Controller
         return ApiResponse::success(new PlaceResource($place), 'Place créée', 201);
     }
 
-    public function update(Request $request, Place $place): JsonResponse
+    public function update(UpdatePlaceRequest $request, Place $place): JsonResponse
     {
         $this->authorize('update', $place);
 
-        $data = $request->validate([
-            'status' => ['sometimes', 'string'],
-            'product_category_ids' => ['sometimes', 'array', 'min:1'],
-            'product_category_ids.*' => ['integer', 'exists:product_categories,id'],
-            'latitude' => ['nullable', 'numeric'],
-            'longitude' => ['nullable', 'numeric'],
-        ]);
-
-        $place = $this->placeService->update($place, $data);
+        $place = $this->placeService->update($place, $request->validated());
 
         return ApiResponse::success(new PlaceResource($place), 'Place mise à jour');
     }
