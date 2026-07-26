@@ -9,6 +9,7 @@ use App\Http\Controllers\API\V1\MarketController;
 use App\Http\Controllers\API\V1\PaymentReceiptController;
 use App\Http\Controllers\API\V1\PlaceController;
 use App\Http\Controllers\API\V1\PlaceRequestController;
+use App\Http\Controllers\API\V1\RolePermissionController;
 use App\Http\Controllers\API\V1\ProductController;
 use App\Http\Controllers\API\V1\SaleController;
 use App\Http\Controllers\API\V1\UserController;
@@ -96,6 +97,11 @@ Route::prefix('v1')->group(function () {
             Route::post('users', [UserController::class, 'store']);
             Route::put('users/{user}', [UserController::class, 'update']);
             Route::delete('users/{user}', [UserController::class, 'destroy']);
+        });
+
+        Route::middleware(['role:SUPER_ADMIN'])->group(function () {
+            Route::get('permissions/roles', [RolePermissionController::class, 'index']);
+            Route::put('permissions/roles/{role}', [RolePermissionController::class, 'update']);
         });
 
         Route::middleware(['permission:manage_categories'])->group(function () {

@@ -56,15 +56,14 @@ class PlaceApiTest extends TestCase
 
         $target = User::factory()->create();
         $target->assignRole('COMMERCANT');
-        $linkedPlace = Place::create([
-            'market_id' => $marketB->id,
-            'market_block_id' => $block->id,
-            'number' => 'B-02',
+        Place::create([
+            'market_id' => $marketA->id,
+            'number' => 'A-99',
             'status' => PlaceStatus::Occupied->value,
             'product_category_ids' => [$category->id],
             'category' => $category->name,
             'chief_user_id' => $target->id,
-            'qr_code' => 'TEST-PLACE-B-02',
+            'qr_code' => 'TEST-PLACE-A-99',
         ]);
 
         $this->postJson("/api/v1/places/{$place->id}/assign-chief", [
