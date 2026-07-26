@@ -152,7 +152,6 @@ class DemoDataSeeder extends Seeder
                 ['market_id' => $market->id, 'title' => 'Tarifs plafonnés Mukeke'],
                 [
                     'content' => 'Les tarifs du Mukeke du Lac Tanganyika sont plafonnés à 25 000 BIF maximum cette semaine.',
-                    'show_on_led' => true,
                     'is_active' => true,
                     'expires_at' => now()->addMonths(3),
                     'created_by' => $superAdmin->id,

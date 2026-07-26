@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\API\V1\AuthController;
 use App\Http\Controllers\API\V1\ProductCategoryController;
-use App\Http\Controllers\API\V1\LedDisplayController;
 use App\Http\Controllers\API\V1\MerchantController;
 use App\Http\Controllers\API\V1\MarketBlockController;
 use App\Http\Controllers\API\V1\MarketController;
@@ -36,8 +35,6 @@ Route::prefix('v1')->group(function () {
     Route::get('products/{product}', [ProductController::class, 'show']);
 
     Route::get('merchants', [MerchantController::class, 'index']);
-
-    Route::get('led-displays/{market}', [LedDisplayController::class, 'show']);
 
     // Authenticated
     Route::middleware(['auth:sanctum', 'active'])->group(function () {

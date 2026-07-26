@@ -53,11 +53,6 @@ class Market extends Model
         return $this->hasMany(Announcement::class);
     }
 
-    public function ledDisplays(): HasMany
-    {
-        return $this->hasMany(LedDisplay::class);
-    }
-
     public function visits(): HasMany
     {
         return $this->hasMany(MarketVisit::class);

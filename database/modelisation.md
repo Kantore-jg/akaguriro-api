@@ -410,49 +410,6 @@ Table payment_receipts {
 }
 
 // ============================================================
-// COMMUNICATION & AFFICHAGE LED
-// ============================================================
-
-TableGroup communication {
-  announcements
-  led_displays
-}
-
-Table announcements {
-  id bigint [pk, increment]
-  market_id bigint [not null]
-  created_by bigint
-  title varchar [not null]
-  content text [not null]
-  show_on_led boolean [not null, default: true]
-  starts_at timestamp
-  expires_at timestamp
-  is_active boolean [not null, default: true]
-  created_at timestamp
-  updated_at timestamp
-
-  indexes {
-    (market_id, is_active, expires_at)
-  }
-}
-
-Table led_displays {
-  id bigint [pk, increment]
-  market_id bigint [not null]
-  display_type varchar [not null]
-  payload json [not null]
-  refresh_interval int [not null, default: 30]
-  is_active boolean [not null, default: true]
-  last_refreshed_at timestamp
-  created_at timestamp
-  updated_at timestamp
-
-  indexes {
-    (market_id, display_type, is_active)
-  }
-}
-
-// ============================================================
 // ANALYTIQUES
 // ============================================================
 
@@ -570,7 +527,6 @@ Ref: payment_receipts.reviewed_by > users.id [delete: set null]
 
 Ref: announcements.market_id > markets.id [delete: cascade]
 Ref: announcements.created_by > users.id [delete: set null]
-Ref: led_displays.market_id > markets.id [delete: cascade]
 
 Ref: product_searches.product_id > products.id [delete: set null]
 Ref: product_searches.market_id > markets.id [delete: set null]

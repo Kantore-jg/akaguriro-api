@@ -8,14 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Announcement extends Model
 {
     protected $fillable = [
-        'market_id', 'title', 'content', 'show_on_led',
+        'market_id', 'title', 'content',
         'starts_at', 'expires_at', 'is_active', 'created_by',
     ];
 
     protected function casts(): array
     {
         return [
-            'show_on_led' => 'boolean',
             'is_active' => 'boolean',
             'starts_at' => 'datetime',
             'expires_at' => 'datetime',
