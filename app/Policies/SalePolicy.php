@@ -14,12 +14,12 @@ class SalePolicy
 
     public function view(User $user, Sale $sale): bool
     {
-        if (! $user->can('manage_sales')) {
-            return false;
-        }
-
         if ($user->id === $sale->user_id) {
             return true;
+        }
+
+        if (! $user->can('manage_sales')) {
+            return false;
         }
 
         if ($user->can('manage_merchants') || $user->can('manage_markets')) {
