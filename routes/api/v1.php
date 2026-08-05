@@ -5,6 +5,7 @@ use App\Http\Controllers\API\V1\ProductCategoryController;
 use App\Http\Controllers\API\V1\MerchantController;
 use App\Http\Controllers\API\V1\MarketBlockController;
 use App\Http\Controllers\API\V1\MarketController;
+use App\Http\Controllers\API\V1\ExcelTransferController;
 use App\Http\Controllers\API\V1\PaymentReceiptController;
 use App\Http\Controllers\API\V1\PlaceController;
 use App\Http\Controllers\API\V1\PlaceRequestController;
@@ -101,5 +102,9 @@ Route::prefix('v1')->group(function () {
             Route::put('product-categories/{productCategory}', [ProductCategoryController::class, 'update']);
             Route::delete('product-categories/{productCategory}', [ProductCategoryController::class, 'destroy']);
         });
+
+        Route::get('admin/excel/export', [ExcelTransferController::class, 'export']);
+        Route::get('admin/excel/template', [ExcelTransferController::class, 'template']);
+        Route::post('admin/excel/import', [ExcelTransferController::class, 'import']);
     });
 });
