@@ -15,7 +15,7 @@ class PlaceResource extends JsonResource
             'market_block_id' => $this->market_block_id,
             'number' => $this->number,
             'qr_code' => $this->qr_code,
-            'status' => $this->status?->toUiLabel(),
+            'status' => $this->status,
             'category' => $this->category,
             'product_category_ids' => $this->product_category_ids ?? [],
             'latitude' => $this->latitude,

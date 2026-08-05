@@ -113,6 +113,6 @@ class PlaceApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.chief.id', $merchant->id)
-            ->assertJsonPath('data.status', 'occupée');
+            ->assertJsonPath('data.status', 'occupied');
     }
 }
