@@ -96,7 +96,7 @@ class DemoDataSeeder extends Seeder
             );
             $admin->assignRole(UserRole::AdminMarche->value);
 
-            $marketCategoryIds = $market->productCategories()->pluck('id')->all();
+            $marketCategoryIds = $market->productCategories()->pluck('product_categories.id')->all();
             $marketCategoryNames = $market->productCategories()->pluck('name')->all();
 
             for ($i = 1; $i <= 5; $i++) {
