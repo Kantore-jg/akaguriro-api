@@ -9,12 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class MarketBlock extends Model
 {
     protected $fillable = [
-        'market_id', 'name', 'code', 'description', 'total_places', 'is_active',
+        'market_id', 'name', 'code', 'description', 'rent_amount', 'total_places', 'is_active',
     ];
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean'];
+        return [
+            'rent_amount' => 'integer',
+            'is_active' => 'boolean',
+        ];
     }
 
     public function market(): BelongsTo

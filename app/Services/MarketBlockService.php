@@ -28,6 +28,7 @@ class MarketBlockService
             'name' => $data['name'],
             'code' => $data['code'] ?? null,
             'description' => $data['description'] ?? null,
+            'rent_amount' => $data['rent_amount'] ?? 0,
             'total_places' => 0,
             'is_active' => $data['is_active'] ?? true,
         ]);
