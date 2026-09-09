@@ -6,6 +6,7 @@ use App\Enums\PlaceStatus;
 use App\Enums\UserRole;
 use App\Models\Announcement;
 use App\Models\Market;
+use App\Models\PaymentMethod;
 use App\Models\Place;
 use App\Models\Product;
 use App\Models\ProductCategory;
@@ -107,6 +108,25 @@ class DemoDataSeeder extends Seeder
                 ]
             );
             $owner->assignRole(UserRole::ProprietaireMarche->value);
+
+            PaymentMethod::firstOrCreate(
+                ['market_id' => $market->id, 'name' => 'Banque de la République du Burundi'],
+                [
+                    'type' => 'bank',
+                    'account_number' => 'BRB-'.str_pad((string) $market->id, 4, '0', STR_PAD_LEFT),
+                    'account_name' => 'Marché '.$market->name,
+                    'is_active' => true,
+                ]
+            );
+            PaymentMethod::firstOrCreate(
+                ['market_id' => $market->id, 'name' => 'Lumicash'],
+                [
+                    'type' => 'mobile_money',
+                    'account_number' => '79'.str_pad((string) $market->id, 6, '0', STR_PAD_LEFT),
+                    'account_name' => 'Caisse '.$market->city,
+                    'is_active' => true,
+                ]
+            );
 
             $marketCategoryIds = $market->productCategories()->pluck('product_categories.id')->all();
             $marketCategoryNames = $market->productCategories()->pluck('name')->all();

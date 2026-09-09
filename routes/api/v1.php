@@ -5,10 +5,12 @@ use App\Http\Controllers\API\V1\ProductCategoryController;
 use App\Http\Controllers\API\V1\MerchantController;
 use App\Http\Controllers\API\V1\MarketBlockController;
 use App\Http\Controllers\API\V1\MarketController;
+use App\Http\Controllers\API\V1\PaymentMethodController;
 use App\Http\Controllers\API\V1\PaymentReceiptController;
 use App\Http\Controllers\API\V1\PlaceController;
 use App\Http\Controllers\API\V1\PlaceRequestController;
 use App\Http\Controllers\API\V1\ProductController;
+use App\Http\Controllers\API\V1\RentSummaryController;
 use App\Http\Controllers\API\V1\SaleController;
 use App\Http\Controllers\API\V1\UserController;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +50,8 @@ Route::prefix('v1')->group(function () {
         Route::post('receipts', [PaymentReceiptController::class, 'store']);
         Route::get('my/receipts', [PaymentReceiptController::class, 'mine']);
 
+        Route::get('payment-methods', [PaymentMethodController::class, 'index']);
+
         Route::post('sales', [SaleController::class, 'store']);
         Route::get('my/sales', [SaleController::class, 'mine']);
         Route::get('sales/{sale}', [SaleController::class, 'show']);
@@ -83,11 +87,15 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware(['permission:manage_receipts|view_market_ops'])->group(function () {
             Route::get('receipts', [PaymentReceiptController::class, 'index']);
+            Route::get('rent-summary', RentSummaryController::class);
         });
 
         Route::middleware(['permission:manage_receipts'])->group(function () {
             Route::post('receipts/{receipt}/approve', [PaymentReceiptController::class, 'approve']);
             Route::post('receipts/{receipt}/reject', [PaymentReceiptController::class, 'reject']);
+            Route::post('payment-methods', [PaymentMethodController::class, 'store']);
+            Route::put('payment-methods/{paymentMethod}', [PaymentMethodController::class, 'update']);
+            Route::delete('payment-methods/{paymentMethod}', [PaymentMethodController::class, 'destroy']);
         });
 
         Route::middleware(['permission:manage_sales'])->group(function () {

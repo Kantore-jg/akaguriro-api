@@ -14,10 +14,10 @@ class StoreReceiptRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'market_id' => ['nullable', 'exists:markets,id'],
-            'place_id' => ['nullable', 'exists:places,id'],
-            'amount' => ['nullable', 'numeric', 'min:0'],
-            'reference' => ['nullable', 'string', 'max:100'],
+            'place_id' => ['required', 'exists:places,id'],
+            'period_year' => ['required', 'integer', 'min:2000', 'max:2100'],
+            'period_month' => ['required', 'integer', 'min:1', 'max:12'],
+            'payment_method_id' => ['required', 'exists:payment_methods,id'],
             'file' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'],
         ];
     }

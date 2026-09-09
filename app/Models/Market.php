@@ -62,4 +62,9 @@ class Market extends Model
     {
         return $this->hasMany(User::class, 'managed_market_id');
     }
+
+    public function paymentMethods(): HasMany
+    {
+        return $this->hasMany(PaymentMethod::class);
+    }
 }

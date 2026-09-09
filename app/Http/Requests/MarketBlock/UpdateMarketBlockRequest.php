@@ -25,7 +25,7 @@ class UpdateMarketBlockRequest extends FormRequest
             ],
             'code' => ['nullable', 'string', 'max:20'],
             'description' => ['nullable', 'string', 'max:500'],
-            'rent_amount' => ['nullable', 'integer', 'min:0'],
+            'rent_amount' => ['sometimes', 'required', 'integer', 'min:1'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

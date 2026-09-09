@@ -17,6 +17,9 @@ class PaymentReceiptResource extends JsonResource
             'user_id' => $this->user_id,
             'market_id' => $this->market_id,
             'place_id' => $this->place_id,
+            'period_year' => $this->period_year,
+            'period_month' => $this->period_month,
+            'payment_method_id' => $this->payment_method_id,
             'file_url' => $storage->url($this->file_path),
             'amount' => $this->amount,
             'reference' => $this->reference,
@@ -26,6 +29,7 @@ class PaymentReceiptResource extends JsonResource
             'user' => new UserResource($this->whenLoaded('user')),
             'market' => new MarketResource($this->whenLoaded('market')),
             'place' => new PlaceResource($this->whenLoaded('place')),
+            'payment_method' => new PaymentMethodResource($this->whenLoaded('paymentMethod')),
             'reviewer' => new UserResource($this->whenLoaded('reviewer')),
             'created_at' => $this->created_at,
         ];
