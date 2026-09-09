@@ -15,6 +15,11 @@ class UserService
         UserRole::User->value,
     ];
 
+    private const MARKET_SCOPED_ROLES = [
+        UserRole::AdminMarche->value,
+        UserRole::ProprietaireMarche->value,
+    ];
+
     public function list(array $filters = [], int $perPage = 50, ?User $actor = null): LengthAwarePaginator
     {
         $query = User::query()
@@ -93,7 +98,7 @@ class UserService
         $role = $data['role'] ?? $user->roles->first()?->name ?? UserRole::User->value;
         $this->assertCanAssignRole($actor, $role);
 
-        $managedMarketId = $role === UserRole::AdminMarche->value
+        $managedMarketId = in_array($role, self::MARKET_SCOPED_ROLES, true)
             ? ($data['managed_market_id'] ?? $user->managed_market_id)
             : null;
 
@@ -174,7 +179,10 @@ class UserService
             return true;
         }
 
-        if ($target->hasRole(UserRole::SuperAdmin->value) || $target->hasRole(UserRole::AdminMarche->value)) {
+        if ($target->hasRole(UserRole::SuperAdmin->value)
+            || $target->hasRole(UserRole::AdminMarche->value)
+            || $target->hasRole(UserRole::ProprietaireMarche->value)
+        ) {
             return false;
         }
 
@@ -252,9 +260,13 @@ class UserService
 
     private function validateRoleConstraints(string $role, ?int $managedMarketId): void
     {
-        if ($role === UserRole::AdminMarche->value && ! $managedMarketId) {
+        if (in_array($role, self::MARKET_SCOPED_ROLES, true) && ! $managedMarketId) {
+            $message = $role === UserRole::ProprietaireMarche->value
+                ? 'Un marché doit être assigné pour un propriétaire de marché.'
+                : 'Un marché doit être assigné pour un administrateur de marché.';
+
             throw ValidationException::withMessages([
-                'managed_market_id' => ['Un marché doit être assigné pour un administrateur de marché.'],
+                'managed_market_id' => [$message],
             ]);
         }
 

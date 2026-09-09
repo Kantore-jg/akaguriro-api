@@ -26,6 +26,7 @@ class RolePermissionSeeder extends Seeder
             'manage_statistics',
             'manage_announcements',
             'manage_led',
+            'view_market_ops',
         ];
 
         foreach ($permissions as $permission) {
@@ -37,6 +38,11 @@ class RolePermissionSeeder extends Seeder
             UserRole::AdminMarche->value => [
                 'manage_users', 'manage_places', 'manage_merchants', 'manage_products', 'manage_categories',
                 'manage_receipts', 'manage_sales', 'manage_statistics', 'manage_announcements', 'manage_led',
+                'view_market_ops',
+            ],
+            UserRole::ProprietaireMarche->value => [
+                'manage_statistics',
+                'view_market_ops',
             ],
             UserRole::Commercant->value => ['manage_products', 'manage_sales'],
             UserRole::User->value => [],

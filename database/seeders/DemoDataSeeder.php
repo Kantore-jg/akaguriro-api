@@ -96,6 +96,18 @@ class DemoDataSeeder extends Seeder
             );
             $admin->assignRole(UserRole::AdminMarche->value);
 
+            $owner = User::firstOrCreate(
+                ['email' => 'proprietaire.'.strtolower($market->city).'@akaguriro.bi'],
+                [
+                    'name' => 'Propriétaire '.$market->city,
+                    'phone' => '+25772000'.str_pad((string) $market->id, 3, '0', STR_PAD_LEFT),
+                    'password' => Hash::make('password'),
+                    'managed_market_id' => $market->id,
+                    'email_verified_at' => now(),
+                ]
+            );
+            $owner->assignRole(UserRole::ProprietaireMarche->value);
+
             $marketCategoryIds = $market->productCategories()->pluck('product_categories.id')->all();
             $marketCategoryNames = $market->productCategories()->pluck('name')->all();
 

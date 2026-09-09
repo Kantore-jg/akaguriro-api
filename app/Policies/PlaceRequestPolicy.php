@@ -9,16 +9,22 @@ class PlaceRequestPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->can('manage_places') || $user->can('manage_merchants');
+        return $user->can('manage_places')
+            || $user->can('manage_merchants')
+            || $user->can('view_market_ops');
     }
 
     public function approve(User $user, PlaceRequest $placeRequest): bool
     {
-        if ($user->can('manage_places')) {
+        if (! $user->can('manage_places')) {
+            return false;
+        }
+
+        if ($user->can('manage_markets')) {
             return true;
         }
 
-        return $user->managed_market_id === $placeRequest->market_id;
+        return (int) $user->managed_market_id === (int) $placeRequest->market_id;
     }
 
     public function reject(User $user, PlaceRequest $placeRequest): bool

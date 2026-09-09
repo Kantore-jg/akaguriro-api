@@ -63,6 +63,10 @@ Route::prefix('v1')->group(function () {
             Route::delete('markets/{market}', [MarketController::class, 'destroy']);
         });
 
+        Route::middleware(['permission:manage_places|view_market_ops'])->group(function () {
+            Route::get('place-requests', [PlaceRequestController::class, 'index']);
+        });
+
         Route::middleware(['permission:manage_places'])->group(function () {
             Route::post('markets/{market}/blocks', [MarketBlockController::class, 'store']);
             Route::put('market-blocks/{marketBlock}', [MarketBlockController::class, 'update']);
@@ -73,13 +77,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('places/{place}', [PlaceController::class, 'destroy']);
             Route::post('places/{place}/assign-chief', [PlaceController::class, 'assignChief']);
 
-            Route::get('place-requests', [PlaceRequestController::class, 'index']);
             Route::post('place-requests/{placeRequest}/approve', [PlaceRequestController::class, 'approve']);
             Route::post('place-requests/{placeRequest}/reject', [PlaceRequestController::class, 'reject']);
         });
 
-        Route::middleware(['permission:manage_receipts'])->group(function () {
+        Route::middleware(['permission:manage_receipts|view_market_ops'])->group(function () {
             Route::get('receipts', [PaymentReceiptController::class, 'index']);
+        });
+
+        Route::middleware(['permission:manage_receipts'])->group(function () {
             Route::post('receipts/{receipt}/approve', [PaymentReceiptController::class, 'approve']);
             Route::post('receipts/{receipt}/reject', [PaymentReceiptController::class, 'reject']);
         });

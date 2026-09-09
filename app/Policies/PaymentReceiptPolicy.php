@@ -9,7 +9,7 @@ class PaymentReceiptPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->can('manage_receipts');
+        return $user->can('manage_receipts') || $user->can('view_market_ops');
     }
 
     public function approve(User $user, PaymentReceipt $receipt): bool
