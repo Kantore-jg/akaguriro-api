@@ -24,7 +24,7 @@ class AuthService
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        return ['user' => $user->load('roles', 'permissions'), 'token' => $token];
+        return ['user' => $this->loadUserRelations($user), 'token' => $token];
     }
 
     public function login(array $credentials): array
@@ -45,7 +45,7 @@ class AuthService
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        return ['user' => $user->load('roles', 'permissions'), 'token' => $token];
+        return ['user' => $this->loadUserRelations($user), 'token' => $token];
     }
 
     public function logout(User $user): void
@@ -57,7 +57,20 @@ class AuthService
     {
         $user->update($data);
 
-        return $user->fresh(['roles', 'permissions']);
+        return $this->loadUserRelations($user->fresh());
+    }
+
+    public function loadUserRelations(User $user): User
+    {
+        $relations = ['roles', 'permissions'];
+
+        if ($user->hasRole(UserRole::CommerceUser->value)) {
+            $user->load([
+                'commerceMemberships' => fn ($query) => $query->where('is_active', true)->with('commerce'),
+            ]);
+        }
+
+        return $user->loadMissing($relations);
     }
 
     public function updatePassword(User $user, string $currentPassword, string $newPassword): void

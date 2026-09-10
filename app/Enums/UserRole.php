@@ -8,5 +8,6 @@ enum UserRole: string
     case AdminMarche = 'ADMIN_MARCHE';
     case ProprietaireMarche = 'PROPRIETAIRE_MARCHE';
     case Commercant = 'COMMERCANT';
+    case CommerceUser = 'COMMERCE_USER';
     case User = 'USER';
 }

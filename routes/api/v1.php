@@ -1,6 +1,21 @@
 <?php
 
 use App\Http\Controllers\API\V1\AuthController;
+use App\Http\Controllers\API\V1\Commerce\CashRegisterController;
+use App\Http\Controllers\API\V1\Commerce\CashSessionController;
+use App\Http\Controllers\API\V1\Commerce\CommerceController;
+use App\Http\Controllers\API\V1\Commerce\CommerceDashboardController;
+use App\Http\Controllers\API\V1\Commerce\CommerceMeController;
+use App\Http\Controllers\API\V1\Commerce\CommerceProductCategoryController;
+use App\Http\Controllers\API\V1\Commerce\CommerceProductController;
+use App\Http\Controllers\API\V1\Commerce\CommerceReportController;
+use App\Http\Controllers\API\V1\Commerce\CommerceSaleController;
+use App\Http\Controllers\API\V1\Commerce\CommerceUserController;
+use App\Http\Controllers\API\V1\Commerce\PurchaseController;
+use App\Http\Controllers\API\V1\Commerce\StockController;
+use App\Http\Controllers\API\V1\Commerce\StockExitController;
+use App\Http\Controllers\API\V1\Commerce\StockMovementController;
+use App\Http\Controllers\API\V1\Commerce\StockTransferController;
 use App\Http\Controllers\API\V1\ProductCategoryController;
 use App\Http\Controllers\API\V1\MerchantController;
 use App\Http\Controllers\API\V1\MarketBlockController;
@@ -114,6 +129,85 @@ Route::prefix('v1')->group(function () {
             Route::post('product-categories', [ProductCategoryController::class, 'store']);
             Route::put('product-categories/{productCategory}', [ProductCategoryController::class, 'update']);
             Route::delete('product-categories/{productCategory}', [ProductCategoryController::class, 'destroy']);
+        });
+
+        Route::prefix('commerces/current')->middleware(['commerce'])->group(function () {
+            Route::get('/', [CommerceMeController::class, 'show']);
+            Route::put('/', [CommerceMeController::class, 'update'])->middleware('commerce:commerce_manage_settings');
+
+            Route::middleware('commerce:commerce_manage_users')->group(function () {
+                Route::get('users', [CommerceUserController::class, 'index']);
+                Route::post('users', [CommerceUserController::class, 'store']);
+                Route::put('users/{commerceUser}', [CommerceUserController::class, 'update']);
+            });
+
+            // Catalog / stocks readable by any commerce member (POS needs this).
+            Route::get('categories', [CommerceProductCategoryController::class, 'index']);
+            Route::get('products', [CommerceProductController::class, 'index']);
+            Route::get('products/{product}', [CommerceProductController::class, 'show']);
+            Route::get('stocks', [StockController::class, 'index']);
+            Route::get('stocks/{stock}', [StockController::class, 'show']);
+            Route::get('cash-registers', [CashRegisterController::class, 'index']);
+            Route::get('cash-sessions/current', [CashSessionController::class, 'current']);
+
+            Route::middleware('commerce:commerce_manage_products')->group(function () {
+                Route::post('categories', [CommerceProductCategoryController::class, 'store']);
+                Route::put('categories/{category}', [CommerceProductCategoryController::class, 'update']);
+                Route::delete('categories/{category}', [CommerceProductCategoryController::class, 'destroy']);
+
+                Route::post('products', [CommerceProductController::class, 'store']);
+                Route::post('products/import', [CommerceProductController::class, 'import']);
+                Route::get('products/export', [CommerceProductController::class, 'export']);
+                Route::put('products/{product}', [CommerceProductController::class, 'update']);
+                Route::delete('products/{product}', [CommerceProductController::class, 'destroy']);
+            });
+
+            Route::middleware('commerce:commerce_manage_stocks')->group(function () {
+                Route::post('stocks', [StockController::class, 'store']);
+                Route::put('stocks/{stock}', [StockController::class, 'update']);
+
+                Route::get('purchases', [PurchaseController::class, 'index']);
+                Route::post('purchases', [PurchaseController::class, 'store']);
+                Route::get('purchases/{purchase}', [PurchaseController::class, 'show']);
+
+                Route::post('stock-exits', [StockExitController::class, 'store']);
+
+                Route::get('transfers', [StockTransferController::class, 'index']);
+                Route::post('transfers', [StockTransferController::class, 'store']);
+                Route::get('transfers/{transfer}', [StockTransferController::class, 'show']);
+
+                Route::get('movements', [StockMovementController::class, 'index']);
+            });
+
+            Route::middleware('commerce:commerce_manage_cash')->group(function () {
+                Route::post('cash-registers', [CashRegisterController::class, 'store']);
+                Route::get('cash-registers/{cashRegister}', [CashRegisterController::class, 'show']);
+                Route::put('cash-registers/{cashRegister}', [CashRegisterController::class, 'update']);
+
+                Route::post('cash-sessions/open', [CashSessionController::class, 'open']);
+                Route::post('cash-sessions/{cashSession}/close', [CashSessionController::class, 'close']);
+                Route::post('cash-sessions/movements', [CashSessionController::class, 'storeMovement']);
+            });
+
+            Route::middleware('commerce:commerce_manage_sales')->group(function () {
+                Route::get('sales', [CommerceSaleController::class, 'index']);
+                Route::post('sales', [CommerceSaleController::class, 'store']);
+                Route::get('sales/{sale}', [CommerceSaleController::class, 'show']);
+            });
+
+            Route::get('dashboard', CommerceDashboardController::class);
+
+            Route::middleware('commerce:commerce_view_reports')->group(function () {
+                Route::get('reports/{type}', [CommerceReportController::class, 'show']);
+            });
+        });
+
+        Route::middleware(['permission:manage_commerces'])->group(function () {
+            Route::get('commerces', [CommerceController::class, 'index']);
+            Route::post('commerces', [CommerceController::class, 'store']);
+            Route::get('commerces/{commerce}', [CommerceController::class, 'show']);
+            Route::put('commerces/{commerce}', [CommerceController::class, 'update']);
+            Route::post('commerces/{commerce}/owner', [CommerceController::class, 'createOwner']);
         });
     });
 });

@@ -190,5 +190,121 @@ class DemoDataSeeder extends Seeder
                 ]
             );
         }
+
+        $this->seedIndependentCommerce();
+    }
+
+    private function seedIndependentCommerce(): void
+    {
+        $commerce = \App\Models\Commerce::firstOrCreate(
+            ['name' => 'Boutique ABC'],
+            [
+                'type' => 'Boutique générale',
+                'rccm' => 'RC-GITEGA-2024-001',
+                'nif' => '4001234567',
+                'phone' => '+25779000100',
+                'email' => 'contact@boutique-abc.bi',
+                'address' => 'Avenue de la Paix',
+                'province' => 'GITEGA',
+                'commune' => 'Gitega',
+                'zone' => 'Nyamugari',
+                'colline' => 'Centre-ville',
+                'description' => 'Commerce indépendant de démonstration.',
+                'status' => 'active',
+            ]
+        );
+
+        $stock = \App\Models\Stock::firstOrCreate(
+            ['commerce_id' => $commerce->id, 'name' => 'Stock principal'],
+            ['location' => $commerce->address, 'status' => 'active']
+        );
+
+        \App\Models\Stock::firstOrCreate(
+            ['commerce_id' => $commerce->id, 'name' => 'Dépôt'],
+            ['location' => 'Entrepôt arrière', 'status' => 'active']
+        );
+
+        \App\Models\CashRegister::firstOrCreate(
+            ['commerce_id' => $commerce->id, 'name' => 'Caisse principale'],
+            ['status' => 'active']
+        );
+
+        $owner = User::firstOrCreate(
+            ['email' => 'owner.abc@akaguriro.bi'],
+            [
+                'name' => 'Jean Propriétaire',
+                'phone' => '+25779000101',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $owner->syncRoles([UserRole::CommerceUser->value]);
+
+        \App\Models\CommerceUser::firstOrCreate(
+            ['commerce_id' => $commerce->id, 'user_id' => $owner->id],
+            ['role' => 'owner', 'is_active' => true]
+        );
+
+        $cashier = User::firstOrCreate(
+            ['email' => 'caissier.abc@akaguriro.bi'],
+            [
+                'name' => 'Marie Caissière',
+                'phone' => '+25779000102',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $cashier->syncRoles([UserRole::CommerceUser->value]);
+
+        \App\Models\CommerceUser::firstOrCreate(
+            ['commerce_id' => $commerce->id, 'user_id' => $cashier->id],
+            ['role' => 'cashier', 'is_active' => true]
+        );
+
+        $stockManager = User::firstOrCreate(
+            ['email' => 'stock.abc@akaguriro.bi'],
+            [
+                'name' => 'Paul Magasinier',
+                'phone' => '+25779000103',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $stockManager->syncRoles([UserRole::CommerceUser->value]);
+
+        \App\Models\CommerceUser::firstOrCreate(
+            ['commerce_id' => $commerce->id, 'user_id' => $stockManager->id],
+            ['role' => 'stock_manager', 'is_active' => true]
+        );
+
+        $products = [
+            ['name' => 'Sucre 1kg', 'sku' => 'SUC-1KG', 'unit' => 'kg', 'purchase_price' => 2500, 'sale_price' => 3000, 'min_stock' => 20],
+            ['name' => 'Huile 1L', 'sku' => 'HUI-1L', 'unit' => 'L', 'purchase_price' => 6000, 'sale_price' => 7000, 'min_stock' => 10],
+            ['name' => 'Riz 5kg', 'sku' => 'RIZ-5KG', 'unit' => 'sac', 'purchase_price' => 12000, 'sale_price' => 15000, 'min_stock' => 5],
+        ];
+
+        foreach ($products as $productData) {
+            $product = \App\Models\CommerceProduct::firstOrCreate(
+                ['commerce_id' => $commerce->id, 'sku' => $productData['sku']],
+                array_merge($productData, [
+                    'commerce_id' => $commerce->id,
+                    'status' => 'active',
+                    'vat_rate' => 0,
+                ])
+            );
+
+            \App\Models\StockItem::firstOrCreate(
+                ['stock_id' => $stock->id, 'product_id' => $product->id],
+                [
+                    'quantity' => match ($productData['sku']) {
+                        'SUC-1KG' => 120,
+                        'HUI-1L' => 50,
+                        'RIZ-5KG' => 30,
+                        default => 0,
+                    },
+                    'avg_purchase_price' => $productData['purchase_price'],
+                ]
+            );
+        }
     }
 }

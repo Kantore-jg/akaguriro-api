@@ -57,7 +57,7 @@ class AuthController extends Controller
 
     public function profile(Request $request): JsonResponse
     {
-        return ApiResponse::success(new UserResource($request->user()->load('roles', 'permissions')));
+        return ApiResponse::success(new UserResource($this->authService->loadUserRelations($request->user())));
     }
 
     public function updateProfile(UpdateProfileRequest $request): JsonResponse

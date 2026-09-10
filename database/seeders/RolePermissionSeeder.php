@@ -27,11 +27,29 @@ class RolePermissionSeeder extends Seeder
             'manage_announcements',
             'manage_led',
             'view_market_ops',
+            'manage_commerces',
+            'commerce_manage_users',
+            'commerce_manage_products',
+            'commerce_manage_stocks',
+            'commerce_manage_sales',
+            'commerce_manage_cash',
+            'commerce_view_reports',
+            'commerce_manage_settings',
         ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'sanctum']);
         }
+
+        $commercePermissions = [
+            'commerce_manage_users',
+            'commerce_manage_products',
+            'commerce_manage_stocks',
+            'commerce_manage_sales',
+            'commerce_manage_cash',
+            'commerce_view_reports',
+            'commerce_manage_settings',
+        ];
 
         $roles = [
             UserRole::SuperAdmin->value => $permissions,
@@ -45,6 +63,7 @@ class RolePermissionSeeder extends Seeder
                 'view_market_ops',
             ],
             UserRole::Commercant->value => ['manage_products', 'manage_sales'],
+            UserRole::CommerceUser->value => $commercePermissions,
             UserRole::User->value => [],
         ];
 
